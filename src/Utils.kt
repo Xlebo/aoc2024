@@ -1,21 +1,47 @@
-import java.math.BigInteger
-import java.security.MessageDigest
-import kotlin.io.path.Path
-import kotlin.io.path.readText
+import java.io.File
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
-/**
- * Reads lines from the given input txt file.
- */
-fun readInput(name: String) = Path("src/$name.txt").readText().trim().lines()
+fun fetchInputData(day: Int = 1): String {
+    val cookie = System.getProperty("cookie")
+    val client = HttpClient.newBuilder().build()
+    val request = HttpRequest.newBuilder()
+        .setHeader(
+            "cookie",
+            "session=$cookie"
+        )
+        .uri(URI.create("https://adventofcode.com/2024/day/$day/input"))
+        .build()
+    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+    return response.body()
+}
 
-/**
- * Converts string to md5 hash.
- */
-fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteArray()))
-    .toString(16)
-    .padStart(32, '0')
+fun getOrFetchInputDataAsString(day: Int = 1): String {
+    val parent = "day${day.toString().padStart(2, '0')}"
+    val f = File("src\\$parent", "$${parent}_input.txt")
 
-/**
- * The cleaner shorthand for printing output.
- */
-fun Any?.println() = println(this)
+    if (!f.exists()) {
+        f.createNewFile()
+        f.writeBytes(fetchInputData(day).toByteArray())
+    }
+
+    return f.readText()
+}
+
+fun getOrFetchInputData(day: Int = 1): List<String> {
+    val parent = "day${day.toString().padStart(2, '0')}"
+    val f = File("src\\$parent", "${parent}_input.txt")
+
+    if (!f.exists()) {
+        f.createNewFile()
+        f.writeBytes(fetchInputData(day).toByteArray())
+    }
+
+    return f.readLines()
+}
+
+fun getTestInput(day: Int, file: String): List<String> {
+    return File("src\\day${day.toString().padStart(2, '0')}", "$file.txt").readLines()
+}
