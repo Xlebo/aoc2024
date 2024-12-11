@@ -20,7 +20,7 @@ fun fetchInputData(day: Int = 1): String {
 
 fun getOrFetchInputDataAsString(day: Int = 1): String {
     val parent = "day${day.toString().padStart(2, '0')}"
-    val f = File("src\\$parent", "$${parent}_input.txt")
+    val f = File("src\\$parent", "${parent}_input.txt")
 
     if (!f.exists()) {
         f.createNewFile()
@@ -44,4 +44,8 @@ fun getOrFetchInputData(day: Int = 1): List<String> {
 
 fun getTestInput(day: Int, file: String): List<String> {
     return File("src\\day${day.toString().padStart(2, '0')}", "$file.txt").readLines()
+}
+
+fun getTestInputAsString(day: Int, file: String): String {
+    return File("src\\day${day.toString().padStart(2, '0')}", "$file.txt").readText()
 }
