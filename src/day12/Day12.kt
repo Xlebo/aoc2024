@@ -14,7 +14,7 @@ fun main() {
     val test1 = part1(testInput)
     check(test1 == 140) { "Got $test1" }
 
-    val testInput2 = getTestInput(12, "example2")
+    val testInput2 = getTestInput(12, "example2.txt")
     val test2 = part1(testInput2)
     check(test2 == 772) { "Got $test2" }
 

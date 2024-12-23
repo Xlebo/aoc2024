@@ -112,7 +112,7 @@ fun main() {
     val test1 = part1(testInput)
     check(test1 == 7036) { "Got $test1" }
 
-    val testInput2 = getTestInput(16, "example2")
+    val testInput2 = getTestInput(16, "example2.txt")
     val test2 = part1(testInput2)
     check(test2 == 11048) { "Got: $test2" }
 
