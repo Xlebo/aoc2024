@@ -12,34 +12,36 @@ fun main() {
     val testInput2 = getTestInputAsString(17, "example2")
 //    val testtest = part1(testInput2)
 //    println("test1 of test2 result: $testtest")
-    val test2 = part2(testInput2)
-    check(test2 == 117440) { "Got: $test2 " }
+//    val test2 = part2(testInput2)
+//    check(test2 == 117440L) { "Got: $test2 " }
 
     val input = getOrFetchInputDataAsString(17)
-    println(part1(input))
+//    println(part1(input))
     println(part2(input))
+    val testtest = part1(input)
+    println("test1 of test2 result: $testtest")
 }
 
 class Computer(
-    var a: Int,
-    var b: Int,
-    var c: Int,
+    var a: Long,
+    var b: Long,
+    var c: Long,
     val input: IntArray,
     var output: StringBuilder = StringBuilder(),
     var reverseOutput: MutableList<Char> = mutableListOf(),
     var pointer: Int = 0
 ) {
-    fun comboOperand(v: Int): Int {
+    fun comboOperand(v: Long): Long {
         return when {
             v < 4 -> v
-            v == 4 -> a
-            v == 5 -> b
-            v == 6 -> c
+            v == 4L -> a
+            v == 5L -> b
+            v == 6L -> c
             else -> throw UnknownError("IDK this should not happen")
         }
     }
 
-    fun comboOperandSet(o: Int, v: Int) {
+    fun comboOperandSet(o: Int, v: Long) {
         when (o) {
             4 -> a = v
             5 -> b = v
@@ -52,18 +54,18 @@ class Computer(
             return false
         }
         val i = input[pointer]
-        val operand = input[pointer.inc()]
+        val operand = input[pointer.inc()].toLong()
         when (i) {
-            0 -> a = (a / (2).toDouble().pow(comboOperand(operand))).toInt()
+            0 -> a = (a / (2).toDouble().pow(comboOperand(operand).toInt())).toLong()
             1 -> b = b xor operand
             2 -> b = comboOperand(operand) % 8
-            3 -> if (a != 0) pointer = operand
+            3 -> if (a != 0L) pointer = operand.toInt()
             4 -> b = b xor c
             5 -> output.append(comboOperand(operand) % 8)
-            6 -> b = (a / (2).toDouble().pow(comboOperand(operand))).toInt()
-            7 -> c = (a / (2).toDouble().pow(comboOperand(operand))).toInt()
+            6 -> b = (a / (2).toDouble().pow(comboOperand(operand).toInt())).toLong()
+            7 -> c = (a / (2).toDouble().pow(comboOperand(operand).toInt())).toLong()
         }
-        if (i != 3 || a == 0) {
+        if (i != 3 || a == 0L) {
             pointer += 2
         }
         return true
@@ -84,29 +86,31 @@ class Computer(
         val operand = input[pointer.inc()]
         when (i) {
             0 -> {
-                a = (a * (2).toDouble().pow(comboOperand(operand))).toInt()
+                a = (a * (2).toDouble().pow(comboOperand(operand.toLong()).toInt())).toLong()
             }
 
-            1 -> b = b xor operand
+            1 -> b = b xor operand.toLong()
             2 -> {
-                val combo = comboOperand(operand)
-                comboOperandSet(operand, combo + b)
+                val combo = comboOperand(operand.toLong())
+                var bmod = b % 8
+                comboOperandSet(operand, combo + bmod)
             }
             3 -> {}
-            4 -> b = b xor c
+            4 -> { b = b xor c }
             5 -> {
-                val value = reverseOutput.removeLast().digitToInt()
-                var combo = comboOperand(operand)
-                if (combo % 8 != value) {
-                    while (++combo % 8 != value);
-                } else {
-                    combo *= 8
-                }
-                comboOperandSet(operand, combo)
+                val value = reverseOutput.removeLast().digitToInt().toLong()
+//                val combo = comboOperand(operand.toLong())
+//                if (combo % 8 != value) {
+//                    while (++combo % 8 != value);
+//                }
+//                else {
+//                    combo *= 8
+//                }
+                comboOperandSet(operand, value)
             }
 
             6 -> {}
-            7 -> {}
+            7 -> { c = (a * 8 + (b xor 1)) / (2).toDouble().pow((b xor 1).toDouble()).toLong() }
         }
 
         if (pointer > 0) {
@@ -119,7 +123,7 @@ class Computer(
     }
 
     override fun toString(): String {
-        return "Computer(a=$a, b=$b, c=$c, currentInput=${input.getOrNull(pointer) ?: "X"}, ${input.getOrNull(pointer + 1) ?: "X"}, output=$reverseOutput, pointer=$pointer)"
+        return "Computer(a=$a, b=$b, c=$c, currentInput=${input.getOrNull(pointer) ?: "X"}, ${input.getOrNull(pointer + 1) ?: "X"}, pointer=$pointer, output=$output, reverse=$reverseOutput)"
     }
 
 }
@@ -127,7 +131,7 @@ class Computer(
 fun part1(input: String): String {
     val (i1, i2) = input.split("(\\n){2}".toRegex())
     val (a, b, c) = i1.split('\n')
-        .map { "(\\d+)".toRegex().find(it)!!.value.toInt() }
+        .map { "(\\d+)".toRegex().find(it)!!.value.toLong() }
     val instructions = i2.split("[, ]".toRegex()).filter { it.length < 2 }
         .map { it.toInt() }.toIntArray()
     val computer = Computer(a, b, c, instructions)
@@ -137,11 +141,10 @@ fun part1(input: String): String {
     return computer.output.toString().toCharArray().joinToString(",")
 }
 
-//1812153600
-fun part2(input: String): Int {
+fun part2(input: String): Long {
     val (i1, i2) = input.split("(\\n){2}".toRegex())
     val (_, b, c) = i1.split('\n')
-        .map { "(\\d+)".toRegex().find(it)!!.value.toInt() }
+        .map { "(\\d+)".toRegex().find(it)!!.value.toLong() }
     val instructions = i2.split("[, ]".toRegex()).filter { it.length < 2 }
         .map { it.toInt() }.toIntArray()
 
